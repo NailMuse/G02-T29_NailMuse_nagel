@@ -18,6 +18,30 @@ class AppProvider with ChangeNotifier {
 
   List<ServiceModel> get services => _services;
 
+void addService(ServiceModel service) {
+  _services.add(service);
+  notifyListeners();
+}
+
+void updateService(ServiceModel updatedService) {
+  final index = _services.indexWhere(
+    (service) => service.serviceId == updatedService.serviceId,
+  );
+
+  if (index == -1) return;
+
+  _services[index] = updatedService;
+  notifyListeners();
+}
+
+void removeService(String serviceId) {
+  _services.removeWhere(
+    (service) => service.serviceId == serviceId,
+  );
+
+  notifyListeners();
+}
+
   List<AppointmentModel> get appointments => _appointments;
 
   List<InventoryItemModel> get inventory => _inventory;
