@@ -45,7 +45,7 @@ class MySlotScreen extends StatelessWidget {
                                   .spaceBetween,
                           children: [
                             Text(
-                              appt.customerName,
+                              appt.userName,
                               style: const TextStyle(
                                 fontWeight:
                                     FontWeight.bold,
@@ -62,7 +62,7 @@ class MySlotScreen extends StatelessWidget {
                         const SizedBox(height: 8),
 
                         Text(
-                          appt.customerPhone,
+                          appt.userPhone,
                         ),
 
                         const SizedBox(height: 8),
