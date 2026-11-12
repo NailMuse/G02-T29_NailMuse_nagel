@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import '../../../features/booking/providers/booking_provider.dart';
 import '../../design_preferences/screens/my_design_screen.dart';
 import '../providers/availability_provider.dart';
+import '../../../screens/customer_dashboard_screen.dart';
+import '../../../screens/my_slot_screen.dart';
 
 class DateTimeScreen extends StatelessWidget {
   const DateTimeScreen({super.key});
@@ -23,7 +25,7 @@ class DateTimeScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: cream,
-      appBar: AppBar(
+      appBar: AppBar(automaticallyImplyLeading: false,
         backgroundColor: burgundy,
         foregroundColor: Colors.white,
         centerTitle: true,
@@ -181,6 +183,55 @@ class DateTimeScreen extends StatelessWidget {
                 ),
               ],
             ),
+      bottomNavigationBar: NavigationBar(
+        backgroundColor: Colors.white,
+        indicatorColor: const Color(0xFFDCE8F8),
+        selectedIndex: 0,
+        onDestinationSelected: (index) {
+          switch (index) {
+            case 0:
+              break;
+
+            case 1:
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const MySlotScreen(),
+                ),
+                (_) => false,
+              );
+              break;
+
+            case 2:
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      const NailMuseAiPlaceholder(),
+                ),
+                (_) => false,
+              );
+              break;
+          }
+        },
+        destinations: const [
+          NavigationDestination(
+            icon: Icon(Icons.calendar_month_outlined),
+            selectedIcon: Icon(Icons.calendar_month),
+            label: 'Book Now',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.event_note_outlined),
+            selectedIcon: Icon(Icons.event_note),
+            label: 'My Slot',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.auto_awesome_outlined),
+            selectedIcon: Icon(Icons.auto_awesome),
+            label: 'Nail Muse AI',
+          ),
+        ],
+      ),
     );
   }
 

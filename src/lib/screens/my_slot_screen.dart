@@ -52,8 +52,13 @@ class MySlotScreen extends StatelessWidget {
                               ),
                             ),
                             Chip(
+                              backgroundColor:
+                                  const Color(0xFFDCE8F8),
                               label: Text(
                                 appt.appointmentStatus,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ],
@@ -68,7 +73,13 @@ class MySlotScreen extends StatelessWidget {
                         const SizedBox(height: 8),
 
                         Text(
-                          'Appointment: ${appt.appointmentDateTime}',
+                          'Appointment: '
+                          '${appt.appointmentDateTime.day}/'
+                          '${appt.appointmentDateTime.month}/'
+                          '${appt.appointmentDateTime.year} '
+                          '${appt.appointmentDateTime.hour > 12 ? appt.appointmentDateTime.hour - 12 : appt.appointmentDateTime.hour}:'
+                          '${appt.appointmentDateTime.minute.toString().padLeft(2, '0')} '
+                          '${appt.appointmentDateTime.hour >= 12 ? 'PM' : 'AM'}',
                         ),
 
                         const SizedBox(height: 8),
