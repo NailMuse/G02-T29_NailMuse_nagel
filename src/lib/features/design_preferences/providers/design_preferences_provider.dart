@@ -1,24 +1,24 @@
-
 import 'package:flutter/foundation.dart';
 
 class DesignPreferencesProvider extends ChangeNotifier {
   String? _selectedStyle;
   String? _selectedColour;
+  String? _selectedShape;
+
   String _designNotes = '';
   String _referenceImageUrl = '';
 
   String? get selectedStyle => _selectedStyle;
   String? get selectedColour => _selectedColour;
+  String? get selectedShape => _selectedShape;
+
   String get designNotes => _designNotes;
   String get referenceImageUrl => _referenceImageUrl;
 
   final List<String> styles = [
-    'Minimalist',
-    'French Tips',
-    'Floral',
-    'Chrome',
+    'Plain',
+    'French',
     'Glitter',
-    'Abstract',
   ];
 
   final List<String> colours = [
@@ -32,6 +32,12 @@ class DesignPreferencesProvider extends ChangeNotifier {
     'Other',
   ];
 
+  final List<String> shapes = [
+    'Almond',
+    'Square',
+    'Round',
+  ];
+
   void selectStyle(String style) {
     _selectedStyle = style;
     notifyListeners();
@@ -39,6 +45,11 @@ class DesignPreferencesProvider extends ChangeNotifier {
 
   void selectColour(String colour) {
     _selectedColour = colour;
+    notifyListeners();
+  }
+
+  void selectShape(String shape) {
+    _selectedShape = shape;
     notifyListeners();
   }
 
@@ -55,8 +66,11 @@ class DesignPreferencesProvider extends ChangeNotifier {
   void clearPreferences() {
     _selectedStyle = null;
     _selectedColour = null;
+    _selectedShape = null;
+
     _designNotes = '';
     _referenceImageUrl = '';
+
     notifyListeners();
   }
 }
