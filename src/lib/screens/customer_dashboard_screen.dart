@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../features/booking/screens/choose_service_screen.dart';
 import 'my_slot_screen.dart';
+import '../widgets/switch_role_button.dart';
 
 class CustomerDashboardScreen extends StatefulWidget {
   const CustomerDashboardScreen({super.key});
@@ -75,6 +76,7 @@ class NailMuseAiPlaceholder extends StatelessWidget {
         foregroundColor: Colors.white,
         centerTitle: true,
         title: const Text('Nail Muse AI'),
+        actions: const [SwitchRoleButton()],
       ),
       body: const Center(
         child: Padding(
