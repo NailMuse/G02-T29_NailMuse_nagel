@@ -20,6 +20,22 @@ class AppProvider with ChangeNotifier {
 
   List<InventoryItemModel> get inventory => _inventory;
 
+  // FR-07 Inventory (Issue #19) - added by Aida
+  void addInventoryItem(InventoryItemModel item) {
+    _inventory.insert(0, item);
+    notifyListeners();
+  }
+
+  void updateInventoryQuantity(String itemId, int newQuantity) {
+    final index = _inventory.indexWhere((x) => x.itemId == itemId);
+    if (index == -1 || newQuantity < 0) return; // stock cannot be below 0
+    _inventory[index] = _inventory[index].copyWith(
+      itemQuantity: newQuantity,
+      itemUpdatedAt: DateTime.now(),
+    );
+    notifyListeners();
+  }
+
   // Service management
   void addService(ServiceModel service) {
     _services.add(service);
