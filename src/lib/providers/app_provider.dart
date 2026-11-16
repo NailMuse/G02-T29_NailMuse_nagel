@@ -1,5 +1,3 @@
-// annabell
-// lib/providers/app_provider.dart
 
 import 'package:flutter/foundation.dart';
 
@@ -22,6 +20,48 @@ class AppProvider with ChangeNotifier {
 
   List<InventoryItemModel> get inventory => _inventory;
 
+  // FR-07 Inventory (Issue #19) - added by Aida
+  void addInventoryItem(InventoryItemModel item) {
+    _inventory.insert(0, item);
+    notifyListeners();
+  }
+
+  void updateInventoryQuantity(String itemId, int newQuantity) {
+    final index = _inventory.indexWhere((x) => x.itemId == itemId);
+    if (index == -1 || newQuantity < 0) return; // stock cannot be below 0
+    _inventory[index] = _inventory[index].copyWith(
+      itemQuantity: newQuantity,
+      itemUpdatedAt: DateTime.now(),
+    );
+    notifyListeners();
+  }
+
+  // Service management
+  void addService(ServiceModel service) {
+    _services.add(service);
+    notifyListeners();
+  }
+
+  void updateService(ServiceModel updatedService) {
+    final index = _services.indexWhere(
+      (service) => service.serviceId == updatedService.serviceId,
+    );
+
+    if (index == -1) return;
+
+    _services[index] = updatedService;
+    notifyListeners();
+  }
+
+  void removeService(String serviceId) {
+    _services.removeWhere(
+      (service) => service.serviceId == serviceId,
+    );
+
+    notifyListeners();
+  }
+
+  // Appointment management
   void addAppointment(AppointmentModel appointment) {
     _appointments.add(appointment);
     notifyListeners();
@@ -43,25 +83,29 @@ class AppProvider with ChangeNotifier {
       (appt) => appt.appointmentId == appointmentId,
     );
 
-    if (index != -1) {
-      final appointment = _appointments[index];
+    if (index == -1) return;
 
-      _appointments[index] = AppointmentModel(
-        appointmentId: appointment.appointmentId,
-        customerId: appointment.customerId,
-        customerName: appointment.customerName,
-        customerPhone: appointment.customerPhone,
-        appointmentDateTime: appointment.appointmentDateTime,
-        appointmentStatus: status,
-        designReferenceUrl: appointment.designReferenceUrl,
-        designNotes: appointment.designNotes,
-        depositPaid: appointment.depositPaid,
-        reminderSent: appointment.reminderSent,
-        appointmentCreatedAt:
-            appointment.appointmentCreatedAt,
-      );
+    final appointment = _appointments[index];
 
-      notifyListeners();
-    }
+    _appointments[index] = AppointmentModel(
+      appointmentId: appointment.appointmentId,
+      customerId: appointment.customerId,
+      customerName: appointment.customerName,
+      customerPhone: appointment.customerPhone,
+      appointmentDateTime: appointment.appointmentDateTime,
+      appointmentStatus: status,
+      serviceId: appointment.serviceId,
+      serviceName: appointment.serviceName,
+      servicePrice: appointment.servicePrice,
+      designStyle: appointment.designStyle,
+      designColour: appointment.designColour,
+      designReferenceUrl: appointment.designReferenceUrl,
+      designNotes: appointment.designNotes,
+      depositPaid: appointment.depositPaid,
+      reminderSent: appointment.reminderSent,
+      appointmentCreatedAt: appointment.appointmentCreatedAt,
+    );
+
+    notifyListeners();
   }
 }

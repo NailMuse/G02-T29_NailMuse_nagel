@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../features/service_catalogue/screens/service_catalogue_screen.dart';
 import 'owner_schedule_screen.dart';
+import '../features/auth/widgets/logout_button.dart';
 
 class OwnerDashboardScreen extends StatelessWidget {
   const OwnerDashboardScreen({super.key});
@@ -18,6 +19,7 @@ class OwnerDashboardScreen extends StatelessWidget {
         title: const Text('Owner Dashboard'),
         backgroundColor: backgroundCream,
         elevation: 0,
+        actions: const [LogoutButton()],
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),

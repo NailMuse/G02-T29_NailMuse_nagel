@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/app_provider.dart';
+import 'customer_dashboard_screen.dart';
 
 class MySlotScreen extends StatelessWidget {
   const MySlotScreen({super.key});
@@ -12,6 +13,10 @@ class MySlotScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final appointments =
         Provider.of<AppProvider>(context).appointments;
+
+    final bool isInsideDashboard =
+        context.findAncestorWidgetOfExactType<CustomerDashboardScreen>() !=
+            null;
 
     return Scaffold(
       appBar: AppBar(
@@ -52,8 +57,13 @@ class MySlotScreen extends StatelessWidget {
                               ),
                             ),
                             Chip(
+                              backgroundColor:
+                                  const Color(0xFFDCE8F8),
                               label: Text(
                                 appt.appointmentStatus,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                           ],
@@ -68,7 +78,13 @@ class MySlotScreen extends StatelessWidget {
                         const SizedBox(height: 8),
 
                         Text(
-                          'Appointment: ${appt.appointmentDateTime}',
+                          'Appointment: '
+                          '${appt.appointmentDateTime.day}/'
+                          '${appt.appointmentDateTime.month}/'
+                          '${appt.appointmentDateTime.year} '
+                          '${appt.appointmentDateTime.hour > 12 ? appt.appointmentDateTime.hour - 12 : appt.appointmentDateTime.hour}:'
+                          '${appt.appointmentDateTime.minute.toString().padLeft(2, '0')} '
+                          '${appt.appointmentDateTime.hour >= 12 ? 'PM' : 'AM'}',
                         ),
 
                         const SizedBox(height: 8),
@@ -120,6 +136,40 @@ class MySlotScreen extends StatelessWidget {
                   ),
                 );
               },
+            ),
+      bottomNavigationBar: isInsideDashboard
+          ? null
+          : NavigationBar(
+              backgroundColor: Colors.white,
+              indicatorColor: const Color(0xFFDCE8F8),
+              selectedIndex: 1,
+              onDestinationSelected: (index) {
+                if (index == 1) return;
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const CustomerDashboardScreen(),
+                  ),
+                  (route) => false,
+                );
+              },
+              destinations: const [
+                NavigationDestination(
+                  icon: Icon(Icons.calendar_month_outlined),
+                  selectedIcon: Icon(Icons.calendar_month),
+                  label: 'Book Now',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.event_note_outlined),
+                  selectedIcon: Icon(Icons.event_note),
+                  label: 'My Slot',
+                ),
+                NavigationDestination(
+                  icon: Icon(Icons.auto_awesome_outlined),
+                  selectedIcon: Icon(Icons.auto_awesome),
+                  label: 'Nail Muse AI',
+                ),
+              ],
             ),
     );
   }
