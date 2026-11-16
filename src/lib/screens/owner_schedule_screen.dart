@@ -29,83 +29,46 @@ class _OwnerScheduleScreenState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Page label
               const Text(
                 'Owner schedule',
                 style: TextStyle(
                   color: Colors.grey,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w500,
+                  fontSize: 12,
                 ),
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
 
               // Header
               Container(
-                height: 65,
+                height: 58,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
                   color: nightBordeaux,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(4),
                 ),
                 child: const Text(
                   'My schedule',
                   style: TextStyle(
                     color: ivoryMist,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
               // Date and booking count
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.calendar_month_outlined,
-                        color: nightBordeaux,
-                        size: 22,
-                      ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        'Tues 10 Nov 2026',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: nightBordeaux,
-                        ),
-                      ),
-                    ],
-                  ),
-
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 7,
-                    ),
-                    decoration: BoxDecoration(
-                      color: coolHorizon.withValues(alpha: 0.25),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Text(
-                      '3 bookings',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: nightBordeaux,
-                      ),
-                    ),
-                  ),
+                  Text('Tues 10 Nov 2026'),
+                  Text('3 bookings'),
                 ],
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
               // Appointment 1
               const AppointmentCard(
@@ -113,9 +76,10 @@ class _OwnerScheduleScreenState
                 customer: 'Aisyah',
                 service: 'Classic gel',
                 deposit: 'Deposit paid',
+                selectedAction: 'Confirm',
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
 
               // Appointment 2
               const AppointmentCard(
@@ -123,9 +87,10 @@ class _OwnerScheduleScreenState
                 customer: 'Meimei',
                 service: 'Builder gel',
                 deposit: 'Deposit pending',
+                selectedAction: 'Confirm',
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
 
               // Appointment 3
               const AppointmentCard(
@@ -133,94 +98,52 @@ class _OwnerScheduleScreenState
                 customer: 'Jess',
                 service: 'Manicure',
                 deposit: 'No Deposit',
+                selectedAction: 'Reject',
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
 
               // Low stock notification
               InkWell(
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text(
-                        'Restock feature coming soon.',
-                      ),
+                      content: Text('Restock feature coming soon.'),
                     ),
                   );
                 },
                 borderRadius: BorderRadius.circular(12),
                 child: Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: coolHorizon.withValues(alpha: 0.3),
+                    color: coolHorizon,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: coolHorizon,
-                      width: 1,
-                    ),
                   ),
-                  child: const Row(
+                  child: const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        Icons.warning_amber_rounded,
-                        color: nightBordeaux,
-                        size: 28,
-                      ),
-
-                      SizedBox(width: 12),
-
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Low stock alert',
-                              style: TextStyle(
-                                color: nightBordeaux,
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-
-                            SizedBox(height: 5),
-
-                            Text(
-                              'Gel base coat (2 left)',
-                              style: TextStyle(
-                                color: nightBordeaux,
-                                fontSize: 13,
-                              ),
-                            ),
-
-                            SizedBox(height: 8),
-
-                            Text(
-                              'Tap to restock',
-                              style: TextStyle(
-                                color: nightBordeaux,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
-                          ],
+                      Text(
+                        'Low stock gel base coat (2 left)',
+                        style: TextStyle(
+                          color: nightBordeaux,
+                          fontSize: 13,
                         ),
                       ),
-
-                      Icon(
-                        Icons.arrow_forward_ios,
-                        color: nightBordeaux,
-                        size: 16,
+                      SizedBox(height: 8),
+                      Text(
+                        'Tap to restock',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                        ),
                       ),
                     ],
                   ),
                 ),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
             ],
           ),
         ),
@@ -231,12 +154,10 @@ class _OwnerScheduleScreenState
         currentIndex: _selectedIndex,
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
-        selectedItemColor: nightBordeaux,
-        unselectedItemColor: Colors.grey,
+        selectedItemColor: coolHorizon,
+        unselectedItemColor: Colors.black87,
         selectedFontSize: 12,
         unselectedFontSize: 12,
-        showUnselectedLabels: true,
-        elevation: 8,
 
         onTap: (index) {
           if (index == 0) {
@@ -257,7 +178,7 @@ class _OwnerScheduleScreenState
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.event_note),
-            label: 'My Schedule',
+            label: 'MySchedule',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.access_time),
@@ -283,6 +204,7 @@ class AppointmentCard extends StatelessWidget {
   final String customer;
   final String service;
   final String deposit;
+  final String selectedAction;
 
   const AppointmentCard({
     super.key,
@@ -290,48 +212,22 @@ class AppointmentCard extends StatelessWidget {
     required this.customer,
     required this.service,
     required this.deposit,
+    required this.selectedAction,
   });
 
   @override
   Widget build(BuildContext context) {
-    // Deposit badge colours
-    final Color badgeBackground;
-    final Color badgeText;
-
-    if (deposit == 'Deposit paid') {
-      badgeBackground = const Color(0xFFDDF3E4);
-      badgeText = const Color(0xFF246B3B);
-    } else if (deposit == 'Deposit pending') {
-      badgeBackground = const Color(0xFFFFF0CC);
-      badgeText = const Color(0xFF946200);
-    } else {
-      badgeBackground = const Color(0xFFEEEEEE);
-      badgeText = const Color(0xFF555555);
-    }
-
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: Colors.black.withValues(alpha: 0.05),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.04),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
+        borderRadius: BorderRadius.circular(12),
       ),
-
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Time and deposit status
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Expanded(
                 child: Column(
@@ -339,68 +235,40 @@ class AppointmentCard extends StatelessWidget {
                   children: [
                     Text(
                       time,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: nightBordeaux,
-                      ),
+                      style: const TextStyle(fontSize: 14),
                     ),
-
-                    const SizedBox(height: 6),
-
                     Text(
-                      customer,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-
-                    const SizedBox(height: 3),
-
-                    Text(
-                      service,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: Colors.black54,
-                      ),
+                      '$customer | $service',
+                      style: const TextStyle(fontSize: 13),
                     ),
                   ],
                 ),
               ),
 
-              // Deposit badge
               Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 7,
+                  horizontal: 10,
+                  vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: badgeBackground,
+                  color: coolHorizon,
                   borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: nightBordeaux),
                 ),
                 child: Text(
                   deposit,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: badgeText,
-                  ),
+                  style: const TextStyle(fontSize: 12),
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 16),
-
-          const Divider(height: 1),
-
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
 
           // Appointment action buttons
           Wrap(
             spacing: 8,
-            runSpacing: 8,
+            runSpacing: 4,
             children: [
               _actionButton(context, 'Confirm'),
               _actionButton(context, 'Reschedule'),
@@ -413,47 +281,26 @@ class AppointmentCard extends StatelessWidget {
   }
 
   Widget _actionButton(BuildContext context, String label) {
+    final isSelected = label == selectedAction;
+
     return OutlinedButton(
       onPressed: () {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              '$label action will be implemented later.',
-            ),
+            content: Text('$label action will be implemented later.'),
           ),
         );
       },
-
       style: OutlinedButton.styleFrom(
-        backgroundColor: label == 'Confirm'
-            ? coolHorizon
-            : Colors.white,
-        foregroundColor: label == 'Confirm'
-            ? nightBordeaux
-            : Colors.black87,
-        side: BorderSide(
-          color: label == 'Reject'
-              ? nightBordeaux.withValues(alpha: 0.6)
-              : Colors.black26,
-        ),
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 10,
-        ),
-        minimumSize: const Size(0, 36),
+        backgroundColor:
+            isSelected ? coolHorizon : Colors.white,
+        foregroundColor: Colors.black,
+        side: const BorderSide(color: Colors.black),
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        minimumSize: const Size(0, 32),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
       ),
-
-      child: Text(
-        label,
-        style: const TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
+      child: Text(label),
     );
   }
 }
