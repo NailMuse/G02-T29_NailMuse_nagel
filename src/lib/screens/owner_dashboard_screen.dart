@@ -1,6 +1,8 @@
+
 import 'package:flutter/material.dart';
 
 import '../features/service_catalogue/screens/service_catalogue_screen.dart';
+import 'owner_schedule_screen.dart';
 import '../features/auth/widgets/logout_button.dart';
 
 class OwnerDashboardScreen extends StatelessWidget {
@@ -12,6 +14,7 @@ class OwnerDashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: backgroundCream,
       appBar: AppBar(
         title: const Text('Owner Dashboard'),
         backgroundColor: backgroundCream,
@@ -34,7 +37,10 @@ class OwnerDashboardScreen extends StatelessWidget {
             const SizedBox(height: 8),
             const Text(
               'Manage your nail salon business.',
-              style: TextStyle(fontSize: 15, color: Colors.brown),
+              style: TextStyle(
+                fontSize: 15,
+                color: Colors.brown,
+              ),
             ),
             const SizedBox(height: 30),
 
@@ -47,6 +53,23 @@ class OwnerDashboardScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
+
+            _buildDashboardCard(
+  context,
+  icon: Icons.calendar_month,
+  title: 'Owner Schedule',
+  description: 'Manage appointment availability',
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const OwnerScheduleScreen(),
+      ),
+    );
+  },
+),
+
+const SizedBox(height: 12),
 
             _buildDashboardCard(
               context,
@@ -78,7 +101,9 @@ class OwnerDashboardScreen extends StatelessWidget {
     return Card(
       color: Colors.white,
       elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: ListTile(
         contentPadding: const EdgeInsets.all(16),
         leading: CircleAvatar(

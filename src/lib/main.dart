@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/app_provider.dart';
-import 'screens/login_screen.dart';
+import 'screens/owner_schedule_screen.dart';
 
 import 'features/service_catalogue/providers/catalogue_provider.dart';
 import 'features/booking/providers/booking_provider.dart';
@@ -48,7 +48,7 @@ class NagelApp extends StatelessWidget {
           scaffoldBackgroundColor: const Color(0xFFF7F2E0),
           useMaterial3: true,
         ),
-        home: const LoginScreen(),
+        home: const OwnerScheduleScreen(),
         debugShowCheckedModeBanner: false,
       ),
     );
