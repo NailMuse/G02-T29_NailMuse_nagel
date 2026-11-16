@@ -1,7 +1,7 @@
-
 import 'package:flutter/material.dart';
 
 import '../features/service_catalogue/screens/service_catalogue_screen.dart';
+import '../features/auth/widgets/logout_button.dart';
 
 class OwnerDashboardScreen extends StatelessWidget {
   const OwnerDashboardScreen({super.key});
@@ -12,11 +12,11 @@ class OwnerDashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundCream,
       appBar: AppBar(
         title: const Text('Owner Dashboard'),
         backgroundColor: backgroundCream,
         elevation: 0,
+        actions: const [LogoutButton()],
       ),
       body: Padding(
         padding: const EdgeInsets.all(20),
@@ -34,10 +34,7 @@ class OwnerDashboardScreen extends StatelessWidget {
             const SizedBox(height: 8),
             const Text(
               'Manage your nail salon business.',
-              style: TextStyle(
-                fontSize: 15,
-                color: Colors.brown,
-              ),
+              style: TextStyle(fontSize: 15, color: Colors.brown),
             ),
             const SizedBox(height: 30),
 
@@ -81,9 +78,7 @@ class OwnerDashboardScreen extends StatelessWidget {
     return Card(
       color: Colors.white,
       elevation: 1,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: ListTile(
         contentPadding: const EdgeInsets.all(16),
         leading: CircleAvatar(
