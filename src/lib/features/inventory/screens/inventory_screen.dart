@@ -20,6 +20,7 @@ import 'package:provider/provider.dart';
 import '../../../models/enums.dart';
 import '../../../models/inventory_item_model.dart';
 import '../../../providers/app_provider.dart';
+import '../../auth/widgets/logout_button.dart';
 
 class InventoryScreen extends StatefulWidget {
   const InventoryScreen({super.key});
@@ -50,7 +51,10 @@ class _InventoryScreenState extends State<InventoryScreen> {
     final lowCount = items.where((i) => i.isLowStock).length;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Inventory')),
+      appBar: AppBar(
+        title: const Text('Inventory'),
+        actions: const [LogoutButton()],
+      ),
       body: Column(
         children: [
           if (lowCount > 0)

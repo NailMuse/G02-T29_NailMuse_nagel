@@ -7,7 +7,11 @@ const Color nightBordeaux = Color(0xFF5B0015);
 const Color ivoryMist = Color(0xFFF7F2E0);
 
 class OwnerScheduleScreen extends StatefulWidget {
-  const OwnerScheduleScreen({super.key});
+  const OwnerScheduleScreen({super.key, this.embedded = false});
+
+  /// true when this screen is shown inside OwnerShellScreen.
+  /// The shell draws the bottom bar, so this screen hides its own.
+  final bool embedded;
 
   @override
   State<OwnerScheduleScreen> createState() =>
@@ -150,7 +154,9 @@ class _OwnerScheduleScreenState
       ),
 
       // Bottom navigation bar
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: widget.embedded
+          ? null
+          : BottomNavigationBar(
         currentIndex: _selectedIndex,
         type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.white,
