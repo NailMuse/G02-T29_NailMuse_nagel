@@ -5,7 +5,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../screens/customer_dashboard_screen.dart';
-import '../../../screens/owner_dashboard_screen.dart';
+import '../../../screens/owner_shell_screen.dart';
 import '../services/auth_service.dart';
 import 'register_screen.dart';
 
@@ -46,7 +46,7 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
     final Widget next = user.isOwner
-        ? const OwnerDashboardScreen()
+        ? const OwnerShellScreen()
         : const CustomerDashboardScreen();
     Navigator.pushReplacement(
       context,
