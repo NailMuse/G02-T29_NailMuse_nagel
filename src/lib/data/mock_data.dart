@@ -54,5 +54,52 @@ class MockData {
     ),
   ];
 
-  static List<InventoryItemModel> inventoryItems = [];
+  // Demo stock for the owner Inventory screen (UI-10). Not real prices.
+  static List<InventoryItemModel> inventoryItems = [
+    InventoryItemModel(
+      itemId: 'INV-001',
+      itemName: 'Gel base coat',
+      itemCategory: 'polish',
+      itemQuantity: 2,
+      itemMinThreshold: 3,
+      itemUnitPrice: 18.0,
+      itemUpdatedAt: DateTime(2026, 11, 16),
+    ),
+    InventoryItemModel(
+      itemId: 'INV-002',
+      itemName: 'Gel top coat',
+      itemCategory: 'polish',
+      itemQuantity: 6,
+      itemMinThreshold: 3,
+      itemUnitPrice: 18.0,
+      itemUpdatedAt: DateTime(2026, 11, 16),
+    ),
+    InventoryItemModel(
+      itemId: 'INV-003',
+      itemName: 'Gel colours',
+      itemCategory: 'polish',
+      itemQuantity: 24,
+      itemMinThreshold: 5,
+      itemUnitPrice: 12.0,
+      itemUpdatedAt: DateTime(2026, 11, 16),
+    ),
+    InventoryItemModel(
+      itemId: 'INV-004',
+      itemName: 'Cuticle oil',
+      itemCategory: 'tools',
+      itemQuantity: 5,
+      itemMinThreshold: 2,
+      itemUnitPrice: 8.0,
+      itemUpdatedAt: DateTime(2026, 11, 16),
+    ),
+    InventoryItemModel(
+      itemId: 'INV-005',
+      itemName: 'Cotton pads',
+      itemCategory: 'tools',
+      itemQuantity: 12,
+      itemMinThreshold: 4,
+      itemUnitPrice: 6.0,
+      itemUpdatedAt: DateTime(2026, 11, 16),
+    ),
+  ];
 }

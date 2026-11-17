@@ -3,14 +3,14 @@
 // After the owner logs in, this screen opens. The bar has 4 tabs and
 // each tab shows one owner screen:
 //   My Schedule -> OwnerScheduleScreen (UI-08)
-//   Hours       -> Working Hours (UI-09), a "coming soon" page for now
+//   Hours       -> WorkingHoursScreen (UI-09)
 //   Inventory   -> InventoryScreen (UI-10)
 //   Service     -> ServiceCatalogueScreen (UI-11)
 // The customer side uses the same idea in customer_dashboard_screen.dart.
 
 import 'package:flutter/material.dart';
 
-import '../features/auth/widgets/logout_button.dart';
+import '../features/availability/screens/working_hours_screen.dart';
 import '../features/inventory/screens/inventory_screen.dart';
 import '../features/service_catalogue/screens/service_catalogue_screen.dart';
 import 'owner_schedule_screen.dart';
@@ -27,7 +27,7 @@ class _OwnerShellScreenState extends State<OwnerShellScreen> {
 
   final List<Widget> _screens = const [
     OwnerScheduleScreen(embedded: true),
-    _WorkingHoursPlaceholder(),
+    WorkingHoursScreen(),
     InventoryScreen(),
     ServiceCatalogueScreen(),
   ];
@@ -70,37 +70,6 @@ class _OwnerShellScreenState extends State<OwnerShellScreen> {
             label: 'Service',
           ),
         ],
-      ),
-    );
-  }
-}
-
-/// Working Hours (UI-09, FR-02) is not built yet.
-/// Replace this class with the real screen when it is ready.
-class _WorkingHoursPlaceholder extends StatelessWidget {
-  const _WorkingHoursPlaceholder();
-
-  static const Color _ivoryMist = Color(0xFFF7F2E0);
-  static const Color _nightBordeaux = Color(0xFF5B0015);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: _ivoryMist,
-      appBar: AppBar(
-        backgroundColor: _ivoryMist,
-        elevation: 0,
-        title: const Text(
-          'Working Hours',
-          style: TextStyle(
-            color: _nightBordeaux,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: const [LogoutButton()],
-      ),
-      body: const Center(
-        child: Text('Working Hours screen is coming soon (FR-02).'),
       ),
     );
   }
