@@ -3,11 +3,59 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../models/appointment_model.dart';
+import '../models/enums.dart';
 import '../providers/app_provider.dart';
 import 'customer_dashboard_screen.dart';
 
 class MySlotScreen extends StatelessWidget {
   const MySlotScreen({super.key});
+
+  // UI-07b: a cancel less than 48 hours before the appointment
+  // shows the Late Cancellation pop-up (the deposit is not returned).
+  Future<void> _askCancel(
+    BuildContext context,
+    AppointmentModel appt,
+  ) async {
+    final hoursLeft =
+        appt.appointmentDateTime.difference(DateTime.now()).inHours;
+    final isLate = hoursLeft < 48;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(
+          isLate ? 'Late Cancellation' : 'Cancel Booking?',
+        ),
+        content: Text(
+          isLate
+              ? 'This is less than 48 hours before your appointment. '
+                  'If you cancel now, your deposit is not returned.'
+              : 'Do you want to cancel this booking? '
+                  'Your deposit is kept for you.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Keep Booking'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: Text(
+              isLate ? 'Cancel Anyway' : 'Yes, Cancel',
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && context.mounted) {
+      context.read<AppProvider>().updateAppointmentStatus(
+            appt.appointmentId,
+            AppointmentStatus.cancelled,
+          );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -113,24 +161,34 @@ class MySlotScreen extends StatelessWidget {
 
                         const SizedBox(height: 12),
 
-                        OutlinedButton(
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (_) =>
-                                  const AlertDialog(
-                                title: Text(
-                                  'Reschedule Policy',
-                                ),
-                                content: Text(
-                                  'Rescheduling or cancellation must be done at least 48 hours before the appointment.',
-                                ),
+                        if (appt.appointmentStatus !=
+                            AppointmentStatus.cancelled)
+                          Wrap(
+                            spacing: 8,
+                            children: [
+                              OutlinedButton(
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (_) => const AlertDialog(
+                                      title: Text(
+                                        'Reschedule Policy',
+                                      ),
+                                      content: Text(
+                                        'Rescheduling or cancellation must be done at least 48 hours before the appointment.',
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: const Text('Reschedule'),
                               ),
-                            );
-                          },
-                          child:
-                              const Text('Reschedule'),
-                        ),
+                              OutlinedButton(
+                                onPressed: () =>
+                                    _askCancel(context, appt),
+                                child: const Text('Cancel'),
+                              ),
+                            ],
+                          ),
                       ],
                     ),
                   ),
