@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../models/appointment_model.dart';
 import '../providers/app_provider.dart';
 
 class MySlotScreen extends StatelessWidget {
@@ -10,8 +11,7 @@ class MySlotScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appointments =
-        Provider.of<AppProvider>(context).appointments;
+    final appointments = context.watch<AppProvider>().appointments;
 
     return Scaffold(
       appBar: AppBar(
@@ -97,23 +97,34 @@ class MySlotScreen extends StatelessWidget {
 
                         const SizedBox(height: 12),
 
-                        OutlinedButton(
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (_) =>
-                                  const AlertDialog(
-                                title: Text(
-                                  'Reschedule Policy',
-                                ),
-                                content: Text(
-                                  'Rescheduling or cancellation must be done at least 48 hours before the appointment.',
-                                ),
+                        Wrap(
+                          spacing: 8,
+                          children: [
+                            OutlinedButton(
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (_) =>
+                                      const AlertDialog(
+                                    title: Text(
+                                      'Reschedule Policy',
+                                    ),
+                                    content: Text(
+                                      'Rescheduling or cancellation must be done at least 48 hours before the appointment.',
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: const Text('Reschedule'),
+                            ),
+                            if (appt.appointmentStatus.toLowerCase() !=
+                                'cancelled')
+                              OutlinedButton(
+                                onPressed: () =>
+                                    _cancelAppointment(context, appt),
+                                child: const Text('Cancel Appointment'),
                               ),
-                            );
-                          },
-                          child:
-                              const Text('Reschedule'),
+                          ],
                         ),
                       ],
                     ),
@@ -121,6 +132,77 @@ class MySlotScreen extends StatelessWidget {
                 );
               },
             ),
+    );
+  }
+
+  Future<void> _cancelAppointment(
+    BuildContext context,
+    AppointmentModel appointment,
+  ) async {
+    const cancellationNotice =
+        'Appointments can only be cancelled at least 48 hours before the scheduled date and time.';
+    final timeUntilAppointment =
+        appointment.appointmentDateTime.difference(DateTime.now());
+
+    if (timeUntilAppointment < const Duration(hours: 48)) {
+      await _showCancellationPolicy(context, cancellationNotice);
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Cancel appointment?'),
+        content: const Text(
+          'Are you sure you want to cancel this appointment?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Keep Appointment'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, true),
+            child: const Text('Cancel Appointment'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !context.mounted) return;
+
+    // Recheck after confirmation in case the appointment crossed the cutoff.
+    final remainingTime =
+        appointment.appointmentDateTime.difference(DateTime.now());
+    if (remainingTime < const Duration(hours: 48)) {
+      await _showCancellationPolicy(context, cancellationNotice);
+      return;
+    }
+
+    context.read<AppProvider>().updateAppointmentStatus(
+          appointment.appointmentId,
+          'cancelled',
+        );
+  }
+
+  Future<void> _showCancellationPolicy(
+    BuildContext context,
+    String message,
+  ) {
+    if (!context.mounted) return Future<void>.value();
+
+    return showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Cancellation unavailable'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
     );
   }
 }
