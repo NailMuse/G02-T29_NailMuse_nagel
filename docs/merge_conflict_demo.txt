@@ -1,4 +1,4 @@
 NailMuse Merge Conflict Demonstration
 
-Project status: Updated version A
-Updated by: Bruce
+Project status: Updated version A and B
+Updated by: Bruce and Teammate
