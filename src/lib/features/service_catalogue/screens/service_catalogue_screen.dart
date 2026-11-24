@@ -2,30 +2,31 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/theme/app_theme.dart';
 import '../../../models/service_model.dart';
+import '../../../widgets/owner_actions.dart';
 import '../providers/catalogue_provider.dart';
+import '../service_groups.dart';
+import '../widgets/service_category_filter.dart';
 import '../widgets/service_category_section.dart';
 
 class ServiceCatalogueScreen extends StatelessWidget {
   const ServiceCatalogueScreen({super.key});
 
-  static const Color primaryColor = Color(0xFF58372B);
-  static const Color backgroundColor = Color(0xFFF7F2E9);
+  // Brand colours: Night Bordeaux, Cool Horizon, Ivory Mist
+  static const Color primaryColor = AppColors.nightBordeaux;
+  static const Color backgroundColor = AppColors.ivoryMist;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundColor,
       appBar: AppBar(
-        backgroundColor: backgroundColor,
-        elevation: 0,
-        title: const Text(
-          'Service Catalogue',
-          style: TextStyle(
-            color: primaryColor,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        backgroundColor: AppColors.nightBordeaux,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text('Service Catalogue'),
+        actions: const [OwnerActions()],
       ),
       body: Consumer<CatalogueProvider>(
         builder: (context, provider, child) {
@@ -74,7 +75,7 @@ class ServiceCatalogueScreen extends StatelessWidget {
           'Manage your services and pricing.',
           style: TextStyle(
             fontSize: 14,
-            color: Color(0xFF89766D),
+            color: AppColors.ink,
           ),
         ),
       ),
@@ -82,40 +83,9 @@ class ServiceCatalogueScreen extends StatelessWidget {
   }
 
   Widget _buildCategoryFilters(CatalogueProvider provider) {
-    const categories = {
-      'all': 'All',
-      'gel': 'Gel Manicure',
-      'extensions': 'Extensions',
-      'care': 'Care',
-    };
-
-    return SizedBox(
-      height: 52,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        children: categories.entries.map((entry) {
-          final isSelected =
-              provider.selectedCategory == entry.key;
-
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: ChoiceChip(
-              label: Text(entry.value),
-              selected: isSelected,
-              selectedColor: primaryColor,
-              backgroundColor: const Color(0xFFE9DFD2),
-              labelStyle: TextStyle(
-                color: isSelected ? Colors.white : primaryColor,
-                fontWeight: FontWeight.w500,
-              ),
-              onSelected: (_) {
-                provider.selectCategory(entry.key);
-              },
-            ),
-          );
-        }).toList(),
-      ),
+    return ServiceCategoryFilter(
+      selected: provider.selectedCategory,
+      onSelected: provider.selectCategory,
     );
   }
 
@@ -124,33 +94,8 @@ class ServiceCatalogueScreen extends StatelessWidget {
     List<ServiceModel> services,
     CatalogueProvider provider,
   ) {
-    final groups = <String, List<ServiceModel>>{
-      'Classic Gel Manicure': [],
-      'Classic Gel Extensions': [],
-      'Removal': [],
-      'Henna Manicure': [],
-      'Add-ons': [],
-      'Other Services': [],
-    };
-
-    for (final service in services) {
-      final name = service.serviceName.toLowerCase();
-      final description = service.serviceDescription.toLowerCase();
-
-      if (name.contains('builder gel')) {
-        groups['Add-ons']!.add(service);
-      } else if (description.contains('classic gel manicure')) {
-        groups['Classic Gel Manicure']!.add(service);
-      } else if (description.contains('classic gel extensions')) {
-        groups['Classic Gel Extensions']!.add(service);
-      } else if (name.contains('removal')) {
-        groups['Removal']!.add(service);
-      } else if (description.contains('henna')) {
-        groups['Henna Manicure']!.add(service);
-      } else {
-        groups['Other Services']!.add(service);
-      }
-    }
+    // Same groups as the customer Choose Service screen.
+    final groups = ServiceGroups.group(services);
 
     return groups.entries
         .where((entry) => entry.value.isNotEmpty)
@@ -371,8 +316,16 @@ class _ServiceFormDialogState extends State<ServiceFormDialog> {
                     child: Text('Extensions'),
                   ),
                   DropdownMenuItem(
-                    value: 'care',
-                    child: Text('Care'),
+                    value: 'addon',
+                    child: Text('Add-on'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'removal',
+                    child: Text('Removal'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'henna',
+                    child: Text('Henna'),
                   ),
                 ],
                 onChanged: (value) {

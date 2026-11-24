@@ -20,8 +20,10 @@ class UserRole {
 class ServiceCategory {
   static const gel = 'gel';
   static const extensions = 'extensions';
-  static const care = 'care';
-  static const List<String> values = [gel, extensions, care];
+  static const addon = 'addon';
+  static const removal = 'removal';
+  static const henna = 'henna';
+  static const List<String> values = [gel, extensions, addon, removal, henna];
 }
 
 class InventoryCategory {

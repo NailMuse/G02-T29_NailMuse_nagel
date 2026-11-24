@@ -6,9 +6,19 @@ import '../../../providers/app_provider.dart';
 import '../providers/booking_provider.dart';
 import '../widgets/booking_service_card.dart';
 import '../../availability/screens/date_time_screen.dart';
+import '../../service_catalogue/service_groups.dart';
+import '../../service_catalogue/widgets/service_category_filter.dart';
 
-class ChooseServiceScreen extends StatelessWidget {
+class ChooseServiceScreen extends StatefulWidget {
   const ChooseServiceScreen({super.key});
+
+  @override
+  State<ChooseServiceScreen> createState() => _ChooseServiceScreenState();
+}
+
+class _ChooseServiceScreenState extends State<ChooseServiceScreen> {
+  // 'all' or a category such as 'gel' (same buttons as the owner screen)
+  String _category = 'all';
 
   static const Color burgundy = Color(0xFF590019);
   static const Color cream = Color(0xFFF7F2E0);
@@ -16,7 +26,12 @@ class ChooseServiceScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final services = context.watch<AppProvider>().services;
+    final allServices = context.watch<AppProvider>().services;
+    final services = _category == 'all'
+        ? allServices
+        : allServices
+            .where((s) => s.serviceCategory == _category)
+            .toList();
     final bookingProvider = context.watch<BookingProvider>();
 
     return Scaffold(
@@ -40,6 +55,11 @@ class ChooseServiceScreen extends StatelessWidget {
 
       body: Column(
         children: [
+          const SizedBox(height: 12),
+          ServiceCategoryFilter(
+            selected: _category,
+            onSelected: (value) => setState(() => _category = value),
+          ),
           Expanded(
             child: services.isEmpty
                 ? const Center(
@@ -48,26 +68,37 @@ class ChooseServiceScreen extends StatelessWidget {
                       style: TextStyle(color: brown),
                     ),
                   )
-                : ListView.builder(
+                : ListView(
                     padding: const EdgeInsets.fromLTRB(
-                      16, 18, 16, 10,
+                      16, 8, 16, 10,
                     ),
-                    itemCount: services.length,
-                    itemBuilder: (context, index) {
-                      final service = services[index];
-
-                      final isSelected =
-                          bookingProvider.selectedService?.serviceId ==
-                              service.serviceId;
-
-                      return BookingServiceCard(
-                        service: service,
-                        isSelected: isSelected,
-                        onSelect: () {
-                          bookingProvider.selectService(service);
-                        },
-                      );
-                    },
+                    children: [
+                      // Same groups as the owner Service Catalogue.
+                      for (final entry
+                          in ServiceGroups.group(services).entries) ...[
+                        Padding(
+                          padding: const EdgeInsets.only(top: 14, bottom: 10),
+                          child: Text(
+                            entry.key,
+                            style: const TextStyle(
+                              fontSize: 17,
+                              fontWeight: FontWeight.bold,
+                              color: burgundy,
+                            ),
+                          ),
+                        ),
+                        for (final service in entry.value)
+                          BookingServiceCard(
+                            service: service,
+                            isSelected: bookingProvider
+                                    .selectedService?.serviceId ==
+                                service.serviceId,
+                            onSelect: () {
+                              bookingProvider.selectService(service);
+                            },
+                          ),
+                      ],
+                    ],
                   ),
           ),
 

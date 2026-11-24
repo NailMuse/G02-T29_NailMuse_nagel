@@ -8,6 +8,9 @@ import '../../availability/providers/availability_provider.dart';
 import '../../booking/providers/booking_provider.dart';
 import '../../design_preferences/providers/design_preferences_provider.dart';
 import '../../../screens/customer_dashboard_screen.dart';
+import '../../auth/screens/login_screen.dart';
+import '../../auth/screens/register_screen.dart';
+import '../../auth/services/auth_service.dart';
 
 class ConfirmDepositScreen extends StatefulWidget {
   const ConfirmDepositScreen({super.key});
@@ -35,6 +38,108 @@ class _ConfirmDepositScreenState
       TextEditingController();
 
   bool _submitting = false;
+
+  // Name of the receipt the customer attached (null = none yet).
+  String? _receiptName;
+
+  @override
+  void initState() {
+    super.initState();
+    // A registered customer does not need to type name and phone again.
+    final user = AuthService.currentUser;
+    if (user != null && !user.isOwner) {
+      _nameController.text = user.name;
+      _phoneController.text = user.phone;
+    }
+  }
+
+  // Upload receipt (FR-11).
+  // DEMO: no real file is picked yet. A real file picker can be added later.
+  Future<void> _pickReceipt() async {
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                'Upload deposit receipt (demo)',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: const Text('Choose from gallery'),
+              onTap: () => Navigator.pop(sheetContext, 'gallery'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_camera_outlined),
+              title: const Text('Take a photo'),
+              onTap: () => Navigator.pop(sheetContext, 'camera'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.picture_as_pdf_outlined),
+              title: const Text('Choose a PDF'),
+              onTap: () => Navigator.pop(sheetContext, 'pdf'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (choice == null || !mounted) return;
+
+    final stamp = DateTime.now().millisecondsSinceEpoch;
+    setState(() {
+      _receiptName = choice == 'pdf'
+          ? 'receipt_$stamp.pdf'
+          : 'receipt_$stamp.jpg';
+    });
+  }
+
+  // A guest must register (or log in) before booking.
+  Future<void> _askToRegister() async {
+    final choice = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Please register to book'),
+        content: const Text(
+          'You can look around as a guest. '
+          'To book an appointment, please register or log in first.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, 'later'),
+            child: const Text('Not now'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, 'login'),
+            child: const Text('Log in'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, 'register'),
+            child: const Text('Register'),
+          ),
+        ],
+      ),
+    );
+
+    if (!mounted) return;
+
+    if (choice == 'register') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const RegisterScreen()),
+      );
+    } else if (choice == 'login') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+      );
+    }
+  }
 
   @override
   void dispose() {
@@ -81,6 +186,11 @@ class _ConfirmDepositScreenState
   }
 
   Future<void> _confirmBooking() async {
+    if (AuthService.currentUser == null) {
+      await _askToRegister();
+      return;
+    }
+
     if (!_formKey.currentState!
         .validate()) {
       return;
@@ -135,7 +245,8 @@ class _ConfirmDepositScreenState
             'APT-${DateTime.now().millisecondsSinceEpoch}',
 
         customerId:
-            'CUSTOMER-001',
+            AuthService.currentUser?.email ??
+                'CUSTOMER-001',
 
         customerName:
             _nameController.text.trim(),
@@ -165,7 +276,7 @@ class _ConfirmDepositScreenState
             design.selectedStyle,
 
         designColour:
-            design.selectedColour,
+            design.colourForBooking,
 
         designReferenceUrl:
             design
@@ -191,6 +302,10 @@ class _ConfirmDepositScreenState
       app.addAppointment(
         appointment,
       );
+
+      if (_receiptName != null) {
+        app.setReceipt(appointment.appointmentId, _receiptName!);
+      }
 
       if (!mounted) return;
 
@@ -477,7 +592,7 @@ class _ConfirmDepositScreenState
               ),
 
               OutlinedButton(
-                onPressed: () {},
+                onPressed: _pickReceipt,
                 style: OutlinedButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: burgundy,
@@ -493,13 +608,38 @@ class _ConfirmDepositScreenState
                     Colors.white,
                   ),
                 ),
-                child: const Text(
-                  'Upload receipt',
-                  style: TextStyle(
+                child: Text(
+                  _receiptName == null ? 'Upload receipt' : 'Change receipt',
+                  style: const TextStyle(
                     color: burgundy,
                   ),
                 ),
               ),
+
+              if (_receiptName != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.check_circle,
+                        color: Color(0xFF3F6B4C),
+                        size: 18,
+                      ),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          'Receipt attached: $_receiptName',
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () => setState(() => _receiptName = null),
+                        child: const Text('Remove'),
+                      ),
+                    ],
+                  ),
+                ),
 
               const SizedBox(
                 height: 30,

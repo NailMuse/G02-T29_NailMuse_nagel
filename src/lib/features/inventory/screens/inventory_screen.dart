@@ -20,7 +20,7 @@ import 'package:provider/provider.dart';
 import '../../../models/enums.dart';
 import '../../../models/inventory_item_model.dart';
 import '../../../providers/app_provider.dart';
-import '../../auth/widgets/logout_button.dart';
+import '../../../widgets/owner_actions.dart';
 
 class InventoryScreen extends StatefulWidget {
   const InventoryScreen({super.key});
@@ -53,7 +53,7 @@ class _InventoryScreenState extends State<InventoryScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Inventory'),
-        actions: const [LogoutButton()],
+        actions: const [OwnerActions()],
       ),
       body: Column(
         children: [
