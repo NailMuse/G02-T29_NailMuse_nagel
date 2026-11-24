@@ -45,12 +45,22 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() => _error = 'Wrong email or password');
       return;
     }
+    AuthService.ownerPreview.value = false;
     final Widget next = user.isOwner
         ? const OwnerShellScreen()
         : const CustomerDashboardScreen();
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => next),
+    );
+  }
+
+  // Guest: can look at the app, but must register to book.
+  void _continueAsGuest() {
+    AuthService.logout();
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (_) => const CustomerDashboardScreen()),
     );
   }
 
@@ -163,6 +173,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       onPressed: _logIn,
                       child: const Text('Log In'),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 48,
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: _bordeaux,
+                        side: const BorderSide(color: _bordeaux),
+                        shape: const StadiumBorder(),
+                      ),
+                      onPressed: _continueAsGuest,
+                      child: const Text('Continue as guest'),
                     ),
                   ),
                   const SizedBox(height: 16),

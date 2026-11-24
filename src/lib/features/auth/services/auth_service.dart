@@ -8,6 +8,8 @@
 // The owner account is made here once. Register is for customers only,
 // so nobody can sign up as the owner.
 
+import 'package:flutter/foundation.dart';
+
 class AuthRoles {
   AuthRoles._();
 
@@ -64,7 +66,12 @@ class AuthService {
   ];
 
   /// The person who is logged in now (null when nobody is).
+  /// null also means a guest (not logged in yet).
   static AuthUser? currentUser;
+
+  /// true while the owner is looking at the customer screens.
+  /// A "Back to Owner" button shows on every screen (see main.dart).
+  static final ValueNotifier<bool> ownerPreview = ValueNotifier<bool>(false);
 
   /// Returns the user when email and password match, otherwise null.
   static AuthUser? login(String email, String password) {
@@ -104,5 +111,6 @@ class AuthService {
 
   static void logout() {
     currentUser = null;
+    ownerPreview.value = false;
   }
 }

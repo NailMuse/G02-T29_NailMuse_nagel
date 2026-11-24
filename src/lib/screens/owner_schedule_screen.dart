@@ -1,307 +1,358 @@
+// UI-08 Owner Schedule (FR-02, FR-03, FR-11, FR-14).
+// Shows today's date and the REAL bookings made by customers.
+// The owner can confirm or reject a booking and mark the deposit as paid.
+// The low stock banner reads the real Inventory.
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../models/appointment_model.dart';
+import '../models/enums.dart';
+import '../providers/app_provider.dart';
+import '../widgets/owner_actions.dart';
 
 // NailMuse official colour palette
 const Color coolHorizon = Color(0xFF80AEE8);
 const Color nightBordeaux = Color(0xFF5B0015);
 const Color ivoryMist = Color(0xFFF7F2E0);
 
-class OwnerScheduleScreen extends StatefulWidget {
+class OwnerScheduleScreen extends StatelessWidget {
   const OwnerScheduleScreen({super.key, this.embedded = false});
 
   /// true when this screen is shown inside OwnerShellScreen.
-  /// The shell draws the bottom bar, so this screen hides its own.
+  /// The shell draws the bottom bar.
   final bool embedded;
 
-  @override
-  State<OwnerScheduleScreen> createState() =>
-      _OwnerScheduleScreenState();
-}
+  static const List<String> _days = [
+    'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun',
+  ];
+  static const List<String> _months = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  ];
 
-class _OwnerScheduleScreenState
-    extends State<OwnerScheduleScreen> {
-  int _selectedIndex = 0;
+  static String _dateText(DateTime d) =>
+      '${_days[d.weekday - 1]} ${d.day} ${_months[d.month - 1]} ${d.year}';
+
+  static String _timeText(DateTime d) {
+    final hour12 = d.hour % 12 == 0 ? 12 : d.hour % 12;
+    final minute = d.minute.toString().padLeft(2, '0');
+    final period = d.hour >= 12 ? 'pm' : 'am';
+    return '$hour12:$minute $period';
+  }
 
   @override
   Widget build(BuildContext context) {
+    final app = context.watch<AppProvider>();
+
+    // Sort by date and time (earliest first).
+    final appointments = List<AppointmentModel>.from(app.appointments)
+      ..sort(
+        (a, b) => a.appointmentDateTime.compareTo(b.appointmentDateTime),
+      );
+
+    final activeCount = appointments
+        .where((a) => !_isClosed(a.appointmentStatus))
+        .length;
+
+    final lowStock = app.inventory.where((i) => i.isLowStock).toList();
+
     return Scaffold(
       backgroundColor: ivoryMist,
-
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+      appBar: AppBar(
+        backgroundColor: nightBordeaux,
+        foregroundColor: Colors.white,
+        centerTitle: true,
+        title: const Text('My schedule'),
+        actions: const [OwnerActions()],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Owner schedule',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 12,
-                ),
+              Text('Today: ${_dateText(DateTime.now())}'),
+              Text(
+                activeCount == 1 ? '1 booking' : '$activeCount bookings',
               ),
-
-              const SizedBox(height: 8),
-
-              // Header
-              Container(
-                height: 58,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: nightBordeaux,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: const Text(
-                  'My schedule',
-                  style: TextStyle(
-                    color: ivoryMist,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              // Date and booking count
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Tues 10 Nov 2026'),
-                  Text('3 bookings'),
-                ],
-              ),
-
-              const SizedBox(height: 12),
-
-              // Appointment 1
-              const AppointmentCard(
-                time: '7.00pm',
-                customer: 'Aisyah',
-                service: 'Classic gel',
-                deposit: 'Deposit paid',
-                selectedAction: 'Confirm',
-              ),
-
-              const SizedBox(height: 10),
-
-              // Appointment 2
-              const AppointmentCard(
-                time: '8.00pm',
-                customer: 'Meimei',
-                service: 'Builder gel',
-                deposit: 'Deposit pending',
-                selectedAction: 'Confirm',
-              ),
-
-              const SizedBox(height: 10),
-
-              // Appointment 3
-              const AppointmentCard(
-                time: '9.00pm',
-                customer: 'Jess',
-                service: 'Manicure',
-                deposit: 'No Deposit',
-                selectedAction: 'Reject',
-              ),
-
-              const SizedBox(height: 16),
-
-              // Low stock notification
-              InkWell(
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Restock feature coming soon.'),
-                    ),
-                  );
-                },
-                borderRadius: BorderRadius.circular(12),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: coolHorizon,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Low stock gel base coat (2 left)',
-                        style: TextStyle(
-                          color: nightBordeaux,
-                          fontSize: 13,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        'Tap to restock',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 16),
             ],
           ),
-        ),
-      ),
-
-      // Bottom navigation bar
-      bottomNavigationBar: widget.embedded
-          ? null
-          : BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        selectedItemColor: coolHorizon,
-        unselectedItemColor: Colors.black87,
-        selectedFontSize: 12,
-        unselectedFontSize: 12,
-
-        onTap: (index) {
-          if (index == 0) {
-            setState(() {
-              _selectedIndex = index;
-            });
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(
-                  '${['My Schedule', 'Hours', 'Inventory', 'Service'][index]} screen is not connected yet.',
+          const SizedBox(height: 12),
+          if (appointments.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 32),
+              child: Text(
+                'No bookings yet.\nWhen a customer books, it shows here.',
+                textAlign: TextAlign.center,
+              ),
+            )
+          else
+            for (final appt in appointments) ...[
+              _AppointmentCard(
+                appointment: appt,
+                dateText: _dateText(appt.appointmentDateTime),
+                timeText: _timeText(appt.appointmentDateTime),
+              ),
+              const SizedBox(height: 10),
+            ],
+          const SizedBox(height: 6),
+          if (lowStock.isNotEmpty)
+            InkWell(
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Open the Inventory tab to restock.'),
+                  ),
+                );
+              },
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: coolHorizon,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      lowStock.length == 1
+                          ? 'Low stock: ${lowStock.first.itemName} '
+                              '(${lowStock.first.itemQuantity} left)'
+                          : 'Low stock: ${lowStock.first.itemName} '
+                              '(${lowStock.first.itemQuantity} left) '
+                              'and ${lowStock.length - 1} more',
+                      style: const TextStyle(
+                        color: nightBordeaux,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'Open the Inventory tab to restock',
+                      style: TextStyle(color: nightBordeaux, fontSize: 12),
+                    ),
+                  ],
                 ),
               ),
-            );
-          }
-        },
-
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.event_note),
-            label: 'MySchedule',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.access_time),
-            label: 'Hours',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.inventory_2_outlined),
-            label: 'Inventory',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.list_alt),
-            label: 'Service',
-          ),
+            ),
+          const SizedBox(height: 16),
         ],
       ),
     );
   }
+
+  static bool _isClosed(String status) {
+    final s = status.toLowerCase();
+    return s == AppointmentStatus.cancelled || s == 'rejected';
+  }
 }
 
-// Reusable appointment card
-class AppointmentCard extends StatelessWidget {
-  final String time;
-  final String customer;
-  final String service;
-  final String deposit;
-  final String selectedAction;
+class _AppointmentCard extends StatelessWidget {
+  final AppointmentModel appointment;
+  final String dateText;
+  final String timeText;
 
-  const AppointmentCard({
-    super.key,
-    required this.time,
-    required this.customer,
-    required this.service,
-    required this.deposit,
-    required this.selectedAction,
+  const _AppointmentCard({
+    required this.appointment,
+    required this.dateText,
+    required this.timeText,
   });
 
   @override
   Widget build(BuildContext context) {
+    final status = appointment.appointmentStatus.toLowerCase();
+    final closed = status == AppointmentStatus.cancelled ||
+        status == 'rejected';
+    final confirmed = status == AppointmentStatus.confirmed;
+    final provider = context.read<AppProvider>();
+    final note = context.watch<AppProvider>().ownerNoteFor(
+      appointment.appointmentId,
+    );
+    final receipt = context.watch<AppProvider>().receiptFor(
+      appointment.appointmentId,
+    );
+
+    final statusLabel = status == AppointmentStatus.cancelled
+        ? 'Cancelled by customer'
+        : status == 'rejected'
+            ? 'Rejected'
+            : confirmed
+                ? 'Confirmed'
+                : 'Pending';
+
     return Container(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: closed ? const Color(0xFFEFEAD6) : Colors.white,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      time,
-                      style: const TextStyle(fontSize: 14),
+                      '$dateText, $timeText',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
+                    const SizedBox(height: 2),
                     Text(
-                      '$customer | $service',
+                      '${appointment.customerName} | '
+                      '${appointment.serviceName ?? 'Service'}',
                       style: const TextStyle(fontSize: 13),
                     ),
+                    if (appointment.customerPhone.isNotEmpty)
+                      Text(
+                        appointment.customerPhone,
+                        style: const TextStyle(fontSize: 12),
+                      ),
                   ],
                 ),
               ),
-
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: coolHorizon,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: nightBordeaux),
-                ),
-                child: Text(
-                  deposit,
-                  style: const TextStyle(fontSize: 12),
-                ),
+              _chip(
+                appointment.depositPaid ? 'Deposit paid' : 'Deposit pending',
               ),
             ],
           ),
-
-          const SizedBox(height: 10),
-
-          // Appointment action buttons
-          Wrap(
-            spacing: 8,
-            runSpacing: 4,
-            children: [
-              _actionButton(context, 'Confirm'),
-              _actionButton(context, 'Reschedule'),
-              _actionButton(context, 'Reject'),
-            ],
+          const SizedBox(height: 6),
+          Text(
+            'Status: $statusLabel',
+            style: const TextStyle(fontSize: 12),
           ),
+          if (receipt.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              'Receipt: $receipt',
+              style: const TextStyle(fontSize: 12),
+            ),
+          ],
+          if (note.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            Text(
+              'Note: $note',
+              style: const TextStyle(fontSize: 12),
+            ),
+          ],
+          if (!closed) ...[
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 8,
+              runSpacing: 4,
+              children: [
+                _actionButton(
+                  label: 'Confirm',
+                  selected: confirmed,
+                  onPressed: () => provider.updateAppointmentStatus(
+                    appointment.appointmentId,
+                    'Confirmed',
+                  ),
+                ),
+                _actionButton(
+                  label: 'Reject',
+                  selected: false,
+                  onPressed: () => provider.updateAppointmentStatus(
+                    appointment.appointmentId,
+                    'Rejected',
+                  ),
+                ),
+                _actionButton(
+                  label: note.isEmpty ? 'Add note' : 'Edit note',
+                  selected: false,
+                  onPressed: () => _editNote(context, provider, note),
+                ),
+                if (!appointment.depositPaid)
+                  _actionButton(
+                    label: 'Mark deposit paid',
+                    selected: false,
+                    onPressed: () => provider.markDepositPaid(
+                      appointment.appointmentId,
+                    ),
+                  ),
+              ],
+            ),
+          ],
         ],
       ),
     );
   }
 
-  Widget _actionButton(BuildContext context, String label) {
-    final isSelected = label == selectedAction;
+  // FR-12: the owner writes a private note for this appointment.
+  Future<void> _editNote(
+    BuildContext context,
+    AppProvider provider,
+    String current,
+  ) async {
+    final controller = TextEditingController(text: current);
 
-    return OutlinedButton(
-      onPressed: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('$label action will be implemented later.'),
+    final saved = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Appointment note'),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          maxLines: 3,
+          decoration: const InputDecoration(
+            hintText: 'For example: customer wants a short nail shape',
+            border: OutlineInputBorder(),
           ),
-        );
-      },
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(dialogContext, controller.text),
+            child: const Text('Save'),
+          ),
+        ],
+      ),
+    );
+
+    if (saved != null) {
+      provider.setOwnerNote(appointment.appointmentId, saved);
+    }
+  }
+
+  Widget _chip(String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: coolHorizon,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: nightBordeaux),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(fontSize: 12, color: nightBordeaux),
+      ),
+    );
+  }
+
+  Widget _actionButton({
+    required String label,
+    required bool selected,
+    required VoidCallback onPressed,
+  }) {
+    return OutlinedButton(
+      onPressed: onPressed,
       style: OutlinedButton.styleFrom(
-        backgroundColor:
-            isSelected ? coolHorizon : Colors.white,
-        foregroundColor: Colors.black,
-        side: const BorderSide(color: Colors.black),
+        backgroundColor: selected ? coolHorizon : Colors.white,
+        foregroundColor: nightBordeaux,
+        side: const BorderSide(color: nightBordeaux),
         padding: const EdgeInsets.symmetric(horizontal: 12),
         minimumSize: const Size(0, 32),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,

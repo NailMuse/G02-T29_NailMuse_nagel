@@ -32,7 +32,7 @@ class ServiceCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE8DDD5)),
+        border: Border.all(color: const Color(0xFFD9D2BC)),
       ),
       child: Row(
         children: [
@@ -45,7 +45,7 @@ class ServiceCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF58372B),
+                    color: Color(0xFF5B0015),
                   ),
                 ),
                 const SizedBox(height: 5),
@@ -53,7 +53,7 @@ class ServiceCard extends StatelessWidget {
                   description.split('. Price range:').first,
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Color(0xFF89766D),
+                    color: Color(0xFF2A1A1D),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -62,7 +62,7 @@ class ServiceCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF58372B),
+                    color: Color(0xFF5B0015),
                   ),
                 ),
               ],
@@ -79,7 +79,7 @@ class ServiceCard extends StatelessWidget {
               onPressed: onDelete,
               icon: const Icon(Icons.delete_outline),
               tooltip: 'Delete service',
-              color: Colors.redAccent,
+              color: const Color(0xFFC62828),
             ),
         ],
       ),

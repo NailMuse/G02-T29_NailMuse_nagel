@@ -5,12 +5,24 @@ class DesignPreferencesProvider extends ChangeNotifier {
   String? _selectedColour;
   String? _selectedShape;
 
+  String _otherColour = '';
   String _designNotes = '';
   String _referenceImageUrl = '';
 
   String? get selectedStyle => _selectedStyle;
   String? get selectedColour => _selectedColour;
   String? get selectedShape => _selectedShape;
+
+  String get otherColour => _otherColour;
+
+  /// The colour text to save with the booking.
+  /// When the customer picked "Other", this is the colour they typed.
+  String? get colourForBooking {
+    if (_selectedColour == 'Other' && _otherColour.trim().isNotEmpty) {
+      return 'Other: ${_otherColour.trim()}';
+    }
+    return _selectedColour;
+  }
 
   String get designNotes => _designNotes;
   String get referenceImageUrl => _referenceImageUrl;
@@ -48,6 +60,11 @@ class DesignPreferencesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateOtherColour(String colour) {
+    _otherColour = colour;
+    notifyListeners();
+  }
+
   void selectShape(String shape) {
     _selectedShape = shape;
     notifyListeners();
@@ -68,6 +85,7 @@ class DesignPreferencesProvider extends ChangeNotifier {
     _selectedColour = null;
     _selectedShape = null;
 
+    _otherColour = '';
     _designNotes = '';
     _referenceImageUrl = '';
 

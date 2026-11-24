@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../features/booking/providers/booking_provider.dart';
+import '../../../providers/app_provider.dart';
 import '../../design_preferences/screens/my_design_screen.dart';
 import '../providers/availability_provider.dart';
 import '../../../screens/customer_dashboard_screen.dart';
@@ -20,6 +21,7 @@ class DateTimeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final booking = context.watch<BookingProvider>();
     final availability = context.watch<AvailabilityProvider>();
+    final app = context.watch<AppProvider>();
 
     final selectedService = booking.selectedService;
 
@@ -100,7 +102,13 @@ class DateTimeScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
 
-                        _buildCalendar(availability),
+                        _buildCalendar(availability, app),
+
+                        const SizedBox(height: 8),
+                        const Text(
+                          'Grey dates are closed or full.',
+                          style: TextStyle(fontSize: 12),
+                        ),
 
                         const SizedBox(height: 24),
 
@@ -122,8 +130,17 @@ class DateTimeScreen extends StatelessWidget {
                               final isSelected =
                                   availability.selectedTime == time;
 
+                              // This slot is already booked by someone.
+                              final isBooked = availability.selectedDate !=
+                                      null &&
+                                  app
+                                      .bookedSlotLabels(
+                                        availability.selectedDate!,
+                                      )
+                                      .contains(time);
+
                               return ChoiceChip(
-                                label: Text(time),
+                                label: Text(isBooked ? '$time (Full)' : time),
                                 selected: isSelected,
                                 selectedColor: blue,
                                 backgroundColor: Colors.white,
@@ -134,7 +151,8 @@ class DateTimeScreen extends StatelessWidget {
                                   fontWeight: FontWeight.w600,
                                 ),
                                 onSelected:
-                                    availability.selectedDate == null
+                                    availability.selectedDate == null ||
+                                            isBooked
                                         ? null
                                         : (_) {
                                             availability.selectTime(time);
@@ -237,6 +255,7 @@ class DateTimeScreen extends StatelessWidget {
 
   Widget _buildCalendar(
     AvailabilityProvider availability,
+    AppProvider app,
   ) {
     final now = DateTime.now();
     final displayedMonth = DateTime(now.year, now.month);
@@ -338,6 +357,14 @@ class DateTimeScreen extends StatelessWidget {
 
               final isPast = date.isBefore(today);
 
+              // The owner closed this weekday on the Working Hours screen.
+              final isClosed = !availability.isDateOpen(date);
+
+              // Full: every time slot of this date is already booked.
+              final booked = app.bookedSlotLabels(date);
+              final isFull = AvailabilityProvider.slotsFor(date)
+                  .every((slot) => booked.contains(slot));
+
               final selected = availability.selectedDate != null &&
                   availability.selectedDate!.year == date.year &&
                   availability.selectedDate!.month == date.month &&
@@ -345,7 +372,7 @@ class DateTimeScreen extends StatelessWidget {
 
               return InkWell(
                 borderRadius: BorderRadius.circular(30),
-                onTap: isPast
+                onTap: isPast || isClosed || isFull
                     ? null
                     : () {
                         availability.selectDate(date);
@@ -360,7 +387,7 @@ class DateTimeScreen extends StatelessWidget {
                     '$dayNumber',
                     style: TextStyle(
                       fontSize: 13,
-                      color: isPast
+                      color: isPast || isClosed || isFull
                           ? Colors.grey.shade400
                           : selected
                               ? Colors.white

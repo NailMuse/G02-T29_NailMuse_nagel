@@ -9,6 +9,9 @@ import '../../../core/theme/app_theme.dart';
 import '../../../providers/app_provider.dart';
 import '../../../widgets/switch_role_button.dart';
 
+// Demo number. Replace it with the real number of Ms. Michelle.
+const String _ownerPhone = '012-345 6789';
+
 class _ChatMessage {
   final String text;
   final bool fromUser;
@@ -79,8 +82,9 @@ class _NailMuseAiScreenState extends State<NailMuseAiScreen> {
           'Cancel at least 48 hours before your appointment. '
           'If you cancel less than 48 hours before, the deposit is not returned.';
     }
-    return 'Sorry, I can only help with prices, hours and deposit now. '
-        'Please try one of the buttons.';
+    return 'Sorry, I cannot answer this question yet. '
+        'Please contact Ms. Michelle (the owner) at WhatsApp $_ownerPhone '
+        'for more information.';
   }
 
   void _send(String text) {

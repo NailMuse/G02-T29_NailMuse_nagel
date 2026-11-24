@@ -41,6 +41,44 @@ class _MyDesignScreenState extends State<MyDesignScreen> {
     super.dispose();
   }
 
+  // Add a reference photo.
+  // DEMO: no real file is picked yet. A real picker can be added later.
+  Future<void> _pickPhoto() async {
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      builder: (sheetContext) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text(
+                'Add reference photo (demo)',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: const Text('Choose from gallery'),
+              onTap: () => Navigator.pop(sheetContext, 'gallery'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_camera_outlined),
+              title: const Text('Take a photo'),
+              onTap: () => Navigator.pop(sheetContext, 'camera'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    if (choice == null || !mounted) return;
+
+    context.read<DesignPreferencesProvider>().updateReferenceImageUrl(
+          'photo_${DateTime.now().millisecondsSinceEpoch}.jpg',
+        );
+  }
+
   void _goToConfirmScreen() {
     Navigator.push(
       context,
@@ -86,28 +124,50 @@ class _MyDesignScreenState extends State<MyDesignScreen> {
 
             const SizedBox(height: 10),
 
-            Container(
-              width: double.infinity,
-              height: 140,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: Colors.grey.shade300,
+            GestureDetector(
+              onTap: _pickPhoto,
+              child: Container(
+                width: double.infinity,
+                height: 140,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: Colors.grey.shade300,
+                  ),
                 ),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Icon(
-                    Icons.add_photo_alternate_outlined,
-                    size: 40,
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    '+ Add photo',
-                  ),
-                ],
+                child: provider.referenceImageUrl.isEmpty
+                    ? const Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.add_photo_alternate_outlined,
+                            size: 40,
+                          ),
+                          SizedBox(height: 8),
+                          Text('+ Add photo'),
+                        ],
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.check_circle,
+                            size: 36,
+                            color: Color(0xFF3F6B4C),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Photo attached: ${provider.referenceImageUrl}',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                          TextButton(
+                            onPressed: () =>
+                                provider.updateReferenceImageUrl(''),
+                            child: const Text('Remove photo'),
+                          ),
+                        ],
+                      ),
               ),
             ),
 
@@ -152,6 +212,22 @@ class _MyDesignScreenState extends State<MyDesignScreen> {
                 },
               ).toList(),
             ),
+
+            if (provider.selectedColour == 'Other') ...[
+              const SizedBox(height: 12),
+              TextFormField(
+                initialValue: provider.otherColour,
+                onChanged: provider.updateOtherColour,
+                decoration: InputDecoration(
+                  hintText: 'Type the colour you want (for example: lilac)',
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ],
 
             const SizedBox(height: 24),
 

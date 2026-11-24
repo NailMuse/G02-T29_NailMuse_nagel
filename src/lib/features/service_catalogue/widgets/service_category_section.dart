@@ -37,7 +37,7 @@ class ServiceCategorySection extends StatelessWidget {
             style: const TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF58372B),
+              color: Color(0xFF5B0015),
             ),
           ),
         ),
